@@ -1,7 +1,8 @@
-package com.app.ecom;
+package controller;
 
+import model.User;
+import service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +12,7 @@ import java.util.List;
 @RequestMapping("/api")
 public class UserController {
     private final UserService userService;
+
     //long count=1;
    @RequestMapping(value="/user",method= RequestMethod.GET)
 
@@ -29,12 +31,12 @@ public class UserController {
        return userService.getByIdNo(id).map(ResponseEntity::ok).orElseGet(()->ResponseEntity.notFound().build());
 
     }
-    @PostMapping("/api/createUser")
+    @PostMapping("/createUser")
     public ResponseEntity<String> createUser(@RequestBody User user){
 
 
-       userService.addUser(user);
-       return ResponseEntity.ok("User Added Successfully");
+      boolean bh= userService.addUser(user);
+       return bh?ResponseEntity.ok("User Added Successfully"):ResponseEntity.status(204).body("Data alreaddy exists");
 
     }
     @PutMapping("/updateUser/{id}")
@@ -44,5 +46,12 @@ public class UserController {
            return ResponseEntity.status(404).body("Not Updated Sucessfully");
        }
        return ResponseEntity.ok("Update sucessfully");
+    }
+    @RequestMapping(value="/delete/{id}", method=RequestMethod.DELETE)
+    public ResponseEntity<String> deleteUser(@PathVariable long id){
+
+
+       boolean bh=userService.deleteUserById(id);
+       return (bh) ? ResponseEntity.ok("UserDeleted" ): ResponseEntity.status(404).body("NotFound");
     }
 }
